@@ -7,7 +7,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-
+#include <unistd.h>
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -28,7 +28,7 @@ int main()
   {
     boost::asio::io_context io_context;
 
-    tcp::endpoint endpoint(tcp::v4(), 8970);
+    tcp::endpoint endpoint(tcp::v4(), 8971);
     tcp::acceptor acceptor(io_context, endpoint);
 
     for (;;)
@@ -38,10 +38,16 @@ int main()
       acceptor.accept(stream.socket(), ec);
       if (!ec)
       {
-        stream << make_daytime_string();
+        //stream << make_daytime_string();
         //stream << "Tristan Meyers inducted into the Toy Hall of Fame!\n";
 		//JAKE'S CODE VVV
-		
+		//stream <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "Game begins in: ";
+        //for (int i = 1; i < 6 ; i++) {
+        //sleep(1);
+        //stream << i << " "; }
+        //stream << endl;
+		 stream << "testing testing lol";
+		 cout << "Cout testing for serverkekek.";
       }
     }
   }
