@@ -28,7 +28,7 @@ int main()
   {
     boost::asio::io_context io_context;
 
-    tcp::endpoint endpoint(tcp::v4(), 1300);
+    tcp::endpoint endpoint(tcp::v4(), 8970);
     tcp::acceptor acceptor(io_context, endpoint);
 
     for (;;)
@@ -40,6 +40,8 @@ int main()
       {
         stream << make_daytime_string();
         //stream << "Tristan Meyers inducted into the Toy Hall of Fame!\n";
+		//JAKE'S CODE VVV
+		
       }
     }
   }

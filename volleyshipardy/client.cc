@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
+#include <unistd.h>
 using namespace std;
 using boost::asio::ip::tcp;
 
@@ -32,10 +33,15 @@ int main(int argc, char* argv[])
 			return EXIT_FAILURE;
 		}
 
-		string line;
-		//s >> line;
-		getline(s, line);
-		cout << line << endl;
+		//string line;
+		//s >> line OR v
+		//getline(s, line); OR ^
+		//cout << line << endl;
+		cout <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "Game begins in: ";
+		for (int i = 1; i < 6 ; i++) {
+		sleep(1);
+		cout << i << " "; }
+		cout << endl;
 	}
 	catch (exception& e)
 	{
