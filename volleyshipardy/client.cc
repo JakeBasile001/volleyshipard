@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <random>
 #include<map>
+#include <boost/algorithm/string.hpp>
+using boost::replace_all;
 using namespace std;
 using boost::asio::ip::tcp;
 
@@ -30,7 +32,7 @@ int main(int argc, char* argv[])
 			return EXIT_FAILURE;
 		}
 		*/
-		tcp::iostream s("localhost", "8971"); //[1] == host, [2] == port
+		tcp::iostream s("localhost", "8972"); //[1] == host, [2] == port
 		if (!s) //Connection failed
 		{
 			cout << "Unable to connect: " << s.error().message() << endl;
@@ -58,6 +60,7 @@ int main(int argc, char* argv[])
 			string answer = qstack.at(1); 
 			string bruh = qstack.at(0);
 			//bruh.replace(bruh.begin(), bruh.end(), "\\", '\n'); 
+			replace_all(bruh, "\\n", "\n");
 			cout << bruh;
 			qstack.erase(qstack.begin()); //Removes the wuestion prompt
 			shuffle(qstack.begin(), qstack.end(), rng); //Shuffles answers

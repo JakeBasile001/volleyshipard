@@ -26,9 +26,10 @@ int main()
 {
   try
   {
+	  cout << "Test lol" << endl;
     boost::asio::io_context io_context;
 
-    tcp::endpoint endpoint(tcp::v4(), 8971);
+    tcp::endpoint endpoint(tcp::v4(), 8972);
     tcp::acceptor acceptor(io_context, endpoint);
 
     for (;;)
