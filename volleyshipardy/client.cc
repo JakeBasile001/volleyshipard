@@ -25,6 +25,7 @@ using boost::asio::ip::tcp;
 using  namespace chrono;
 int jeopardy(int player, int &seconds2) {
  		ifstream myfile("questions.txt");
+		srand(time(NULL));
         //string line;
         //getline(s, line);           //Testing lines commented out.
         //cout << line << endl;
