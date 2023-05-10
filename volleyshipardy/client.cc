@@ -30,15 +30,11 @@ int jeopardy(int player, int &seconds2) {
         //getline(s, line);           //Testing lines commented out.
         //cout << line << endl;
         auto rng = default_random_engine {};
-        cout <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "You will have 5 second for each question. Game begins in: ";
-        for (int i = 1; i < 6 ; i++) {
-        cout << i << " "; }
-        cout << endl;
 			auto old = steady_clock::now();
             cout << "PLAYER " << player << endl;
             vector<string> qstack = {};
             string garbage;
-            int v1 = rand() % 25;            //NOT WORKING
+            int v1 = rand() % 91;            //91 questions (maybe 92?)
             for (int i = 0; i < v1; i++) {for(int j = 0; j < 5; j++) garbage = readline(myfile);}
             for (int i = 0; i < 5; i++) qstack.push_back(readline(myfile)); //Reads our question
             string answer = qstack.at(1);
@@ -68,6 +64,48 @@ int jeopardy(int player, int &seconds2) {
                 return 0;
             }
         }
+vector<int> battleBoard(int SIZE) { //Creates random board
+	vector<int> gameboard1; 
+	bool flag;
+	for(int i = 0; i < SIZE*SIZE; i++) {
+			int gorp = rand() % 100;
+			if (flag){
+			gameboard1.push_back(1);
+			flag = false;
+			}else if (gorp % 50 == 0){
+                for (int j = 0; j < 5; j++) gameboard1.push_back(1); //2% chance of a battleship of length 5
+                i += 4;
+            } else if (gorp % 20 == 0) {
+                for (int j = 0; j < 3; j++) gameboard1.push_back(1); //5% chance of creating a battleship of lenth 3
+                i += 2;
+            }
+            else gameboard1.push_back(0);
+        }
+	return gameboard1;
+}
+
+vector<int> battleship(int player, vector<int> gameboard) {
+	string answer;
+	cout << "Player " << player << " may take their shot (A-J Row, 0-9 column)" << endl;
+	//
+	//
+	//
+	//		UI code go here // print out the grid and make it pretty // grid is of 0's and 1's
+	//      1's are ships
+	//
+	//
+	//
+	cout << "Tile-To-Shoot: ";
+	cin >> answer;
+	cout << endl;
+	int tile = int(toupper(answer.at(0))) - 65 + int(answer.at(1));
+	if (gameboard.at(tile) == 1) {
+		cout << "HIT!" << endl;
+		gameboard.at(tile) == 0;
+	}
+	else cout << "Miss!" << endl;
+	return gameboard;		
+}
 
 int main(int argc, char* argv[])
 {
@@ -91,19 +129,28 @@ int main(int argc, char* argv[])
 		//cout << line << endl;
 		auto rng = default_random_engine {};
 		cout <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "You will have 5 second for each question. Game begins in: ";
-		for (int i = 1; i < 6 ; i++) {
-		cout << i << " "; }
-		cout << endl;
-		int x = 5;
+		int x = 5; //Amount of seconds the players start with
+		const int SIZE = 10;
+		vector<int> gameboard1 = battleBoard(SIZE);
+		vector<int> gameboard2 = battleBoard(SIZE);  //battleship boards
+		vector<int> zeroVec(gameboard1.size(), 0);
 		while(true) {
 			x = jeopardy(1, x);
 			if (x == 0) {
-				cout << endl << "Player 2 Wins!" << endl;
+				cout << endl << "Player 2 Scores!" << endl;
+				gameboard1 = battleship(2, gameboard1);
+				if (gameboard1 == zeroVec) {
+				cout << "Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
 				break;
+				}
 			} x = jeopardy(2, x);
 			if (x == 0) {
-                cout << endl << "Player 1 Wins!" << endl;
-                break;
+                cout << endl << "Player 1 Scores!" << endl;
+                gameboard2 = battleship(1, gameboard2);
+                if (gameboard2 == zeroVec) {
+                cout << "Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
+				break;
+				}
 		}
 	}
 	}
