@@ -40,7 +40,7 @@ int jeopardy(int player, int &seconds2) {
             string answer = qstack.at(1);
             string bruh = qstack.at(0);
             replace_all(bruh, "\\n", "\n");
-            cout << bruh;
+            cout << bruh << endl;
             qstack.erase(qstack.begin()); //Removes the wuestion prompt
             shuffle(qstack.begin(), qstack.end(), rng); //Shuffles answers
             for (int i = 0; i < qstack.size(); i++) cout << char(65+i) << ") " << qstack.at(i) << endl; //Question output
@@ -66,7 +66,7 @@ int jeopardy(int player, int &seconds2) {
         }
 vector<int> battleBoard(int SIZE) { //Creates random board
 	vector<int> gameboard1; 
-	bool flag;
+	bool flag = true;
 	for(int i = 0; i < SIZE*SIZE; i++) {
 			int gorp = rand() % 100;
 			if (flag){
@@ -86,6 +86,7 @@ vector<int> battleBoard(int SIZE) { //Creates random board
 
 vector<int> battleship(int player, vector<int> gameboard) {
 	string answer;
+	int SIZE = 10;
 	cout << "Player " << player << " may take their shot (A-J Row, 0-9 column)" << endl;
 	//
 	//
@@ -95,15 +96,27 @@ vector<int> battleship(int player, vector<int> gameboard) {
 	//
 	//
 	//
+	int tile = 0;
+	for(int i = 0; i < 3; i++) {
+	while (true) {
 	cout << "Tile-To-Shoot: ";
 	cin >> answer;
-	cout << endl;
-	int tile = int(toupper(answer.at(0))) - 65 + int(answer.at(1));
+	cout << endl; 
+	if (answer.size() != 2) {
+		cout << "TRY AGAIN!" << endl;
+		continue;
+	}
+	tile = int(toupper(answer.at(0))) - 65 + int(answer.at(1)) - 48;
+	//cout << answer.at(0) << toupper(answer.at(0)) << int('2');
+	if (tile < 0 or tile > SIZE*SIZE) cout << "TRY AGAIN!" << endl;
+	else break;
+	}
 	if (gameboard.at(tile) == 1) {
 		cout << "HIT!" << endl;
 		gameboard.at(tile) == 0;
 	}
 	else cout << "Miss!" << endl;
+	}
 	return gameboard;		
 }
 
@@ -129,7 +142,7 @@ int main(int argc, char* argv[])
 		//cout << line << endl;
 		auto rng = default_random_engine {};
 		cout <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "You will have 5 second for each question. Game begins in: ";
-		int x = 5; //Amount of seconds the players start with
+		int x = 20; //Amount of seconds the players start with
 		const int SIZE = 10;
 		vector<int> gameboard1 = battleBoard(SIZE);
 		vector<int> gameboard2 = battleBoard(SIZE);  //battleship boards
