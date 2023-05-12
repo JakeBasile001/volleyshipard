@@ -84,6 +84,11 @@ vector<int> battleBoard(int SIZE) { //Creates random board
 	return gameboard1;
 }
 
+void printBoard(vector<int> board){
+	
+	
+}
+
 vector<int> battleship(int player, vector<int> gameboard) {
 	string answer;
 	int SIZE = 10;
@@ -99,7 +104,14 @@ vector<int> battleship(int player, vector<int> gameboard) {
 	int tile = 0;
 	for(int i = 0; i < 3; i++) {
 	while (true) {
-	cout << "Tile-To-Shoot: ";
+	for(int i = 0; i < SIZE*SIZE; i++){
+		if (i % (SIZE) == 0) cout << endl;
+		if (gameboard.at(i) == 0 or gameboard.at(i) == 1) cout << "-";
+		else if (gameboard.at(i) == 2) cout << "X";
+		else if (gameboard.at(i) == -1) cout << "O";
+		else cout << "Error";
+	}
+	cout << "\nTile-To-Shoot: ";
 	cin >> answer;
 	cout << endl; 
 	if (answer.size() != 2) {
@@ -108,14 +120,17 @@ vector<int> battleship(int player, vector<int> gameboard) {
 	}
 	tile = int(toupper(answer.at(0))) - 65 + int(answer.at(1)) - 48;
 	//cout << answer.at(0) << toupper(answer.at(0)) << int('2');
-	if (tile < 0 or tile > SIZE*SIZE) cout << "TRY AGAIN!" << endl;
+	if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) cout << "TRY AGAIN!" << endl;
 	else break;
 	}
 	if (gameboard.at(tile) == 1) {
 		cout << "HIT!" << endl;
-		gameboard.at(tile) == 0;
+		gameboard.at(tile) = 2;
 	}
-	else cout << "Miss!" << endl;
+	else {
+		cout << "Miss!" << endl;
+		gameboard.at(tile) = -1;
+	}
 	}
 	return gameboard;		
 }
@@ -142,25 +157,33 @@ int main(int argc, char* argv[])
 		//cout << line << endl;
 		auto rng = default_random_engine {};
 		cout <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "You will have 5 second for each question. Game begins in: ";
-		int x = 20; //Amount of seconds the players start with
+		int timeset = 20;
+		int x = timeset; //Amount of seconds the players start with
 		const int SIZE = 10;
 		vector<int> gameboard1 = battleBoard(SIZE);
 		vector<int> gameboard2 = battleBoard(SIZE);  //battleship boards
-		vector<int> zeroVec(gameboard1.size(), 0);
+		//vector<int> zeroVec(gameboard1.size(), 0);
+		bool wflag = true;
 		while(true) {
 			x = jeopardy(1, x);
 			if (x == 0) {
+				wflag = true;
 				cout << endl << "Player 2 Scores!" << endl;
 				gameboard1 = battleship(2, gameboard1);
-				if (gameboard1 == zeroVec) {
+				x = timeset;
+				if(find(gameboard1.begin(), gameboard1.end(), 1) != gameboard1.end()) wflag = false; 
+				if (wflag) {
 				cout << "Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
 				break;
 				}
 			} x = jeopardy(2, x);
 			if (x == 0) {
+				wflag = true;
                 cout << endl << "Player 1 Scores!" << endl;
                 gameboard2 = battleship(1, gameboard2);
-                if (gameboard2 == zeroVec) {
+				x = timeset;
+				if(find(gameboard2.begin(), gameboard2.end(), 1) != gameboard2.end()) wflag = false;
+                if (wflag) {
                 cout << "Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
 				break;
 				}
