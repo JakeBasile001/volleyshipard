@@ -19,6 +19,7 @@
 #include<map>
 #include <boost/algorithm/string.hpp>
 #include <chrono>
+#include "/public/colors.h"
 using boost::replace_all;
 using namespace std;
 using boost::asio::ip::tcp;
@@ -28,7 +29,7 @@ int jeopardy(int player, int &seconds2) {  //Jeopardy function! this performs on
 		srand(time(NULL)); //seeding time for rng
         auto rng = default_random_engine {}; // rng engine (ignore)
 			auto old = steady_clock::now(); //TIME POINT 1
-            cout << "PLAYER " << player << endl; 
+            cout << CYAN << "PLAYER " << player << endl; 
             vector<string> qstack = {}; // holds our question and answer pool
             string garbage; //wuite literally garbage
             int v1 = rand() % 91;            //91 questions (maybe 92?)
@@ -37,16 +38,16 @@ int jeopardy(int player, int &seconds2) {  //Jeopardy function! this performs on
             string answer = qstack.at(1);
             string bruh = qstack.at(0);
             replace_all(bruh, "\\n", "\n"); // formating 
-            cout << bruh << endl;
+            cout << YELLOW << bruh << endl;
             qstack.erase(qstack.begin()); //Removes the wuestion prompt
             shuffle(qstack.begin(), qstack.end(), rng); //Shuffles answers
-            for (int i = 0; i < qstack.size(); i++) cout << char(65+i) << ") " << qstack.at(i) << endl; //Question output
-            cout << "Answer: ";
+            for (int i = 0; i < qstack.size(); i++) cout << WHITE << char(65+i) << ") " <<  qstack.at(i) << endl; //Question output
+            cout << CYAN << "Answer: ";
             string uans = readline(cin); //read in user answer
 			auto ptime = steady_clock::now() - old; // 	TIME POINT 2
 			int btime = duration_cast<seconds>(ptime).count(); // TIMEPOINT 2 - TIMEPOINT 1 = USED TIME
 			if (abs(btime) > seconds2) {
-				cout << "Took too long!" << endl;
+				cout << RED <<"Took too long!" << endl;
 				return 0; //RETURN 0 SECONDS LEFT, TRIGGERING A LOSS
 			}
             if (uans == "a" or uans == "A") uans = qstack.at(0);
@@ -54,18 +55,19 @@ int jeopardy(int player, int &seconds2) {  //Jeopardy function! this performs on
             if (uans == "c" or uans == "C") uans = qstack.at(2);
             if (uans == "d" or uans == "D") uans = qstack.at(3); 
 			if (uans == answer) {
-				cout << "Correct!" << endl;
+				cout << GREEN << "Correct!" << endl;
 				return abs(btime); //RETURN HOWEVER MANY SECONDS LEFT, NOT TRIGGERING A LOSS
 			}else {
-                cout << "Wrong!" << endl;
+                cout << RED << "Wrong!" << endl;
                 return 0; // 0 SEC = LOSS
             }
         }
+void printBoard(vector<int>);
 vector<int> battleBoard(int SIZE) { //Creates random board (1d vector)
-	vector<int> gameboard1; 
-	bool flag = true;
-	for(int i = 0; i < SIZE*SIZE; i++) {
-			int gorp = rand() % 100;
+	vector<int> gameboard(SIZE*SIZE, 0); 
+	//bool flag = true;
+	//for(int i = 0; i < SIZE*SIZE; i++) {  
+			/*int gorp = rand() % 100;
 			if (flag){
 			gameboard1.push_back(1);
 			flag = false;
@@ -77,51 +79,110 @@ vector<int> battleBoard(int SIZE) { //Creates random board (1d vector)
                 i += 2;
             }
             else gameboard1.push_back(0);
-        }
-	return gameboard1;
+        }*/
+	cout <<CYAN << "Setup Phase:" << endl;
+	string answer;
+	printBoard(gameboard);
+	cout << WHITE << "Please enter a square (A-J Row, 0-9 column) to be the first square for the ship" << endl;
+	while (true) {
+	cout << CYAN <<"Ship: XXX      Tile: ";
+	int tile = -1;
+	cin >> answer;
+	tile = (int(toupper(answer.at(0))) - 65)*10 + int(answer.at(1)) - 48; //stupid ascii math
+    if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == 1 or gameboard.at(tile) == 2) cout << RED <<"TRY AGAIN!" << endl; // if we already tried there, try again
+	else if (tile == 0) {
+		for (int i; i < 3; i++)gameboard.at(tile + i) = 3;
+		break;
+	}
+	else if (tile % SIZE == 0 or (tile + 1) % SIZE == 0) cout << RED <<"TRY AGAIN!" << endl;
+    else {
+		for (int i; i < 3; i++)gameboard.at(tile + i) = 3;
+		break;			
+	}
+	}
+	printBoard(gameboard);
+	while (true) {
+    cout << CYAN <<"Ship: XXXXX    Tile: ";
+    int tile = -1;
+    cin >> answer;
+    tile = (int(toupper(answer.at(0))) - 65)*10 + int(answer.at(1)) - 48; //stupid ascii math
+    if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == 1 or gameboard.at(tile) == 2) cout << RED <<"TRY AGAIN!" << endl; // if we already tried there, try again
+    else if (tile == 0) {
+        for (int i; i < 5; i++) gameboard.at(tile + i) = 3;
+        break;
+    }
+    else if (tile % SIZE == 0  or (tile + 1) % SIZE == 0 or (tile + 2) % SIZE == 0 or (tile + 3) % SIZE == 0 or (tile + 4) % SIZE == 0) cout << RED <<"TRY AGAIN!" << endl;
+    else {
+        for (int i; i < 5; i++)gameboard.at(tile + i) = 3;
+        break;
+    }
+	}
+	printBoard(gameboard);
+	while (true) {
+    cout << CYAN <<"Ship: Vetical XXX  Tile: ";
+    int tile = -1;
+    cin >> answer;
+    tile = (int(toupper(answer.at(0))) - 65)*10 + int(answer.at(1)) - 48; //stupid ascii math
+    if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == 1 or gameboard.at(tile) == 2) cout << RED <<"TRY AGAIN!" << endl; // if we already tried there, try again
+	else if (tile >= 80) cout << RED << "TRY AGAIN!" << endl;
+	else {
+        for (int i = 0; i < 30; i += 10)gameboard.at(tile + i) = 3;
+        break;
+    }
+    }
+	cout << YELLOW << "YOUR FINAL BOARD: " << endl;
+	printBoard(gameboard);
+	for (int i = 0; i < gameboard.size(); i++) if (gameboard.at(i) == 3) gameboard.at(i) = 1;
+	return gameboard;
 }
 
+void printBoard(vector<int> gameboard){
+for(int i = 0; i < gameboard.size(); i++){               // BARE BONES UI CODE, JUST PRINTS A GRID (1/0 == NOTHING, 2 == HIT, -1 == MISS)
+        if (i % int(sqrt(gameboard.size())) == 0) cout << endl;
+        if (gameboard.at(i) == 0 or gameboard.at(i) == 1) cout <<WHITE << "-";
+        else if (gameboard.at(i) == 2) cout << GREEN <<"X";
+        else if (gameboard.at(i) == -1) cout << RED << "O";
+		else if (gameboard.at(i) == 3) cout << YELLOW <<"*";
+        else cout << "Error";
+    }
+	cout << endl;
+}
 
 vector<int> battleship(int player, vector<int> gameboard) {
 	string answer;
 	int SIZE = 10;
-	cout << "Player " << player << " may take their shot (A-J Row, 0-9 column)" << endl;
+	cout << CYAN <<"Player " << player << " may take their shot (A-J Row, 0-9 column)" << endl;
 	
 	// UI CODE BELOW vvvvvvvvvvvvv
 	//
 	int tile = 0;
 	for(int i = 0; i < 3; i++) {
 	while (true) {
-	for(int i = 0; i < SIZE*SIZE; i++){               // BARE BONES UI CODE, JUST PRINTS A GRID (1/0 == NOTHING, 2 == HIT, -1 == MISS)
-		if (i % (SIZE) == 0) cout << endl;
-		if (gameboard.at(i) == 0 or gameboard.at(i) == 1) cout << "-";
-		else if (gameboard.at(i) == 2) cout << "X";
-		else if (gameboard.at(i) == -1) cout << "O";
-		else cout << "Error";
-	}
+	printBoard(gameboard);
 	//
 	// UI CODE ABOVE ^^^^^^^^^^^^
 
-	cout << "\nTile-To-Shoot: ";
+	cout << CYAN <<"\nTile-To-Shoot: ";
 	cin >> answer;
 	cout << endl; 
 	if (answer.size() != 2) {
-		cout << "TRY AGAIN!" << endl;
+		cout << RED <<"TRY AGAIN!" << endl;
 		continue;
 	}
-	tile = int(toupper(answer.at(0))) - 65 + int(answer.at(1)) - 48; //stupid ascii math
-	if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) cout << "TRY AGAIN!" << endl; // if we already tried there, try again
+	tile = (int(toupper(answer.at(0))) - 65)*10 + int(answer.at(1)) - 48; //stupid ascii math
+	if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) cout <<RED << "TRY AGAIN!" << endl; // if we already tried there, try again
 	else break;
 	}
 	if (gameboard.at(tile) == 1) {
-		cout << "HIT!" << endl;
+		cout << GREEN << "HIT!" << endl;
 		gameboard.at(tile) = 2; // Hit
 	}
 	else {
-		cout << "Miss!" << endl;
+		cout << RED << "Miss!" << endl;
 		gameboard.at(tile) = -1; // miss
 	}
 	}
+	printBoard(gameboard);
 	return gameboard;		
 }
 
@@ -137,29 +198,30 @@ int main(int argc, char* argv[])
 		}
 		ifstream myfile("questions.txt");
 		auto rng = default_random_engine {};
-		cout <<"Welcome to Volleyshipardy! You are player 1 so you will start first.\n" << "You will have 5 second for each question. Game begins in: ";
+		cout << YELLOW << "Welcome to Volleyshipardy! You are player 1 so you will start first.\n";
 		int timeset = 20;
 		int x = timeset; //Amount of seconds the players start with
 		const int SIZE = 10;
 		vector<int> gameboard1 = battleBoard(SIZE);
+		cout << RED << "Player 2" << endl;
 		vector<int> gameboard2 = battleBoard(SIZE);  //battleship boards
 		while(true) {  //Infinite loop until a win
 			x = jeopardy(1, x); 							//player 1 jeop question
 			if (x == 0) { 									//If they lost, continue for player 2's battleship
-				cout << endl << "Player 2 Scores!" << endl; 
+				cout << endl <<GREEN<< "Player 2 Scores!" << endl; 
 				gameboard1 = battleship(2, gameboard1); 	//plays battleship (See above function)
 				x = timeset; 								//resets jeop timer
 				if (find(gameboard1.begin(), gameboard1.end(), 1) == gameboard1.end()) { //searches for any ships, ends game if none found
-				cout << "Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
+				cout << CYAN <<"Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
 				break;
 				}
 			} x = jeopardy(2, x); //repeat of above code but for opposite player
 			if (x == 0) {
-                cout << endl << "Player 1 Scores!" << endl;
+                cout << endl << GREEN <<"Player 1 Scores!" << endl;
                 gameboard2 = battleship(1, gameboard2);
 				x = timeset;
                 if (find(gameboard2.begin(), gameboard2.end(), 1) == gameboard2.end()) {
-                cout << "Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
+                cout << CYAN <<"Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
 				break;
 				}
 		}
