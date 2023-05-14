@@ -20,6 +20,7 @@
 #include <boost/algorithm/string.hpp>
 #include <chrono>
 #include "/public/colors.h"
+#include <gtest/gtest.h>
 using boost::replace_all;
 using namespace std;
 using boost::asio::ip::tcp;
@@ -148,6 +149,36 @@ for(int i = 0; i < gameboard.size(); i++){               // BARE BONES UI CODE, 
 	cout << endl;
 }
 
+int tileShoot(int tile, vector<int> gameboard) {
+	if (tile < 0 or tile > gameboard.size() or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) return -2;
+	else if (gameboard.at(tile) == 1) {
+		//cout << GREEN << "HIT!" << endl;
+		return 2;
+	}
+	else if (gameboard.at(tile) == 0) {
+		//cout << RED << "Miss!" << endl;
+		return -1;
+	}
+	else return -3;
+}
+
+//Error codes: -2: "tile is not on board or has already been fired at", 1: hit (target is a ship), 2: miss (target is empty), -3: "should never trigger"
+/*
+vector<int> tester(100, 0);
+TEST(TileShoot, GoodTests){
+	EXPECT_EQ(tileShoot(50, tester), 2);
+}
+TEST(tileShoot, BadTests){
+}
+
+TEST(tileShoot, EdgeTests){
+}
+*/
+
+
+
+
+
 vector<int> battleship(int player, vector<int> gameboard) {
 	string answer;
 	int SIZE = 10;
@@ -170,24 +201,19 @@ vector<int> battleship(int player, vector<int> gameboard) {
 		continue;
 	}
 	tile = (int(toupper(answer.at(0))) - 65)*10 + int(answer.at(1)) - 48; //stupid ascii math
-	if (tile < 0 or tile > SIZE*SIZE or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) cout <<RED << "TRY AGAIN!" << endl; // if we already tried there, try again
+	if (tileShoot(tile, gameboard)  == -2) cout << RED << "TRY AGAIN!" << endl; // if we already tried there, try again
 	else break;
 	}
-	if (gameboard.at(tile) == 1) {
-		cout << GREEN << "HIT!" << endl;
-		gameboard.at(tile) = 2; // Hit
-	}
-	else {
-		cout << RED << "Miss!" << endl;
-		gameboard.at(tile) = -1; // miss
-	}
+		gameboard.at(tile) = tileShoot(tile, gameboard);
+		if (gameboard.at(tile) == 2) cout << GREEN << "HIT!" << endl;
+		else if (gameboard.at(tile) == -1) cout << RED << "Miss!" << endl;
 	}
 	printBoard(gameboard);
 	return gameboard;		
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char** argv) {
+	//testing::InitGoogleTest(&argc, argv);
 	try
 	{
 		tcp::iostream s("localhost", "8972"); //[1] == host, [2] == port
@@ -198,7 +224,14 @@ int main(int argc, char* argv[])
 		}
 		ifstream myfile("questions.txt");
 		auto rng = default_random_engine {};
-		cout << YELLOW << "Welcome to Volleyshipardy! You are player 1 so you will start first.\n";
+		//string spaces = "                                                                                ";
+		cout << YELLOW  << "Welcome to Volleyshipardy! Please select an option: \n\n";
+    	cout << GREEN << "play       - will start a game of volleyshipardy " << RED << "immediately!\n";
+    	cout << CYAN <<"test       - will run the test suite you've created.\n";
+    	string st;
+    	getline(cin ,st);
+    	//if (st == "test") return RUN_ALL_TESTS();
+		/*else*/ cout << YELLOW << "Starting now!\n";
 		int timeset = 20;
 		int x = timeset; //Amount of seconds the players start with
 		const int SIZE = 10;
