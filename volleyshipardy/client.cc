@@ -1,12 +1,3 @@
-//
-// daytime_client.cpp
-// ~~~~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2017 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 #include "/public/read.h"
 #include <cstdlib>
 #include <iostream>
@@ -68,7 +59,8 @@ int jeopardy(int player, int &seconds2) {  //Jeopardy function! this performs on
                 return 0; // 0 SEC = LOSS
             }
         }
-void printBoard(vector<int>);
+void printBoard(const vector<int> &vec);
+
 vector<int> battleBoard(int SIZE) { //Creates random board (1d vector)
 	vector<int> gameboard(SIZE*SIZE, 0); 
 	//bool flag = true;
@@ -142,7 +134,7 @@ vector<int> battleBoard(int SIZE) { //Creates random board (1d vector)
 	return gameboard;
 }
 
-void printBoard(vector<int> gameboard){
+void printBoard(const vector<int> &gameboard){
 	cout << "  ";
 	for(int i = 0; i < 10 ; i++) cout << GREEN << i << " ";
 	for(int i = 0; i < gameboard.size(); i++){// BARE BONES UI CODE, JUST PRINTS A GRID (1/0 == NOTHING, 2 == HIT, -1 == MISS)
@@ -160,8 +152,15 @@ void printBoard(vector<int> gameboard){
 	cout << endl;
 }
 
-int tileShoot(int tile, vector<int> gameboard) {
-	if (tile < 0 or tile > gameboard.size() or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) return -2;
+enum ShotCaller {
+	MISSED_ALREADY = -1,
+	OOB = -2,
+	HIT = 2,
+	MISS = -3
+};
+
+int tileShoot(int tile, const vector<int> &gameboard) {
+	if (tile < 0 or tile >= gameboard.size() or gameboard.at(tile) == -1 or gameboard.at(tile) == 2) return -2;
 	else if (gameboard.at(tile) == 1) {
 		//cout << GREEN << "HIT!" << endl;
 		return 2;
@@ -173,18 +172,36 @@ int tileShoot(int tile, vector<int> gameboard) {
 	else return -3;
 }
 
-//Error codes: -2: "tile is not on board or has already been fired at", 1: hit (target is a ship), 2: miss (target is empty), -3: "should never trigger"
-/*
+//Error codes: -2: "tile is not on board or has already been fired at", 2: hit (target is a ship), -1: miss (target is empty), -3: "should never trigger"
+
 vector<int> tester(100, 0);
+vector<int> tester2(100, 1);
+vector<int> tester3(100, 2);
 TEST(TileShoot, GoodTests){
-	EXPECT_EQ(tileShoot(50, tester), 2);
-}
-TEST(tileShoot, BadTests){
+	EXPECT_EQ(tileShoot(50, tester), -1);
+	EXPECT_EQ(tileShoot(50, tester2), 2);
+	EXPECT_EQ(tileShoot(5, tester), -1);
+	EXPECT_EQ(tileShoot(5, tester2), 2);
 }
 
-TEST(tileShoot, EdgeTests){
+TEST(TileShoot, BadTests){
+	EXPECT_EQ(tileShoot(10000, tester), -2);
+	EXPECT_EQ(tileShoot(10000, tester2), -2);
+	EXPECT_EQ(tileShoot(50, tester3), -2);
+	EXPECT_EQ(tileShoot(0, tester3), -2);
 }
-*/
+
+TEST(TileShoot, EdgeTests){
+	EXPECT_EQ(tileShoot(100, tester), -2);
+	EXPECT_EQ(tileShoot(99, tester), -1);
+	EXPECT_EQ(tileShoot(0, tester), -1);
+	EXPECT_EQ(tileShoot(0, tester2), 2);
+	EXPECT_EQ(tileShoot(99, tester2), 2);
+	EXPECT_EQ(tileShoot(-1, tester), -2);
+	EXPECT_EQ(tileShoot(-1, tester2), -2);
+
+}
+
 
 
 
@@ -223,7 +240,6 @@ vector<int> battleship(int player, vector<int> gameboard) {
 	return gameboard;		
 }
 
-//printing "Volleyshipardy" does not work
 void printVolleyshipardy() {
     /*// auto detection
     int gdriver = DETECT,gmode,i;
@@ -249,14 +265,14 @@ void printVolleyshipardy() {
 	*/
 	string vol = R"(
 	eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeee(eee(eeeeeeeeeeeeeeeeeeeee)eeeeeeeeeeeeeeeeeeeeeeee(eeeeeeeeeee
-e(eee(eeeeee)\ee)\eee(eee(eeeeeeeee(e/(e(eeeeeeeeeeeee)ee(eeeee)\e)ee(eeeee
-e)\ee)\e(ee((_)((_)e))\ee)\e)ee(eee)\()))\ee`ee)eee(e/(ee)(eee(()/(ee)\e)ee
-((_)((_))\ee_eee_ee/((_)(()/(ee)\e((_)\((_)e/(/(eee)(_))(()\eee((_))(()/(ee
-\e\e/e/((_)|e|e|e|(_))eee)(_))((_)|e|(_)(_)((_)_\e((_)_ee((_)ee_|e|ee)(_))e
-e\eVe//e_e\|e|e|e|/e-_)e|e||e|(_-<|e'e\e|e||e'_e\)/e_`e||e'_|/e_`e|e|e||e|e
-ee\_/e\___/|_|e|_|\___|ee\_,e|/__/|_||_||_||e.__/e\__,_||_|ee\__,_|ee\_,e|e
-eeeeeeeeeeeeeeeeeeeeeeeee|__/eeeeeeeeeeeeee|_|eeeeeeeeeeeeeeeeeeeeeee|__/ee
+	eeeeeeeeeeee(eee(eeeeeeeeeeeeeeeeeeeee)eeeeeeeeeeeeeeeeeeeeeeee(eeeeeeeeeee
+	e(eee(eeeeee)\ee)\eee(eee(eeeeeeeee(e/(e(eeeeeeeeeeeee)ee(eeeee)\e)ee(eeeee
+	e)\ee)\e(ee((_)((_)e))\ee)\e)ee(eee)\()))\ee`ee)eee(e/(ee)(eee(()/(ee)\e)ee
+	((_)((_))\ee_eee_ee/((_)(()/(ee)\e((_)\((_)e/(/(eee)(_))(()\eee((_))(()/(ee
+	\e\e/e/((_)|e|e|e|(_))eee)(_))((_)|e|(_)(_)((_)_\e((_)_ee((_)ee_|e|ee)(_))e
+	e\eVe//e_e\|e|e|e|/e-_)e|e||e|(_-<|e'e\e|e||e'_e\)/e_`e||e'_|/e_`e|e|e||e|e
+	ee\_/e\___/|_|e|_|\___|ee\_,e|/__/|_||_||_||e.__/e\__,_||_|ee\__,_|ee\_,e|e
+	eeeeeeeeeeeeeeeeeeeeeeeee|__/eeeeeeeeeeeeee|_|eeeeeeeeeeeeeeeeeeeeeee|__/ee
 	)";
 	for(int x = 0; x < vol.size(); x++) {
 		if (vol.at(x) == 'e') cout << ' ';
@@ -267,7 +283,7 @@ eeeeeeeeeeeeeeeeeeeeeeeee|__/eeeeeeeeeeeeee|_|eeeeeeeeeeeeeeeeeeeeeee|__/ee
 }
 
 int main(int argc, char** argv) {
-	//testing::InitGoogleTest(&argc, argv);
+	testing::InitGoogleTest(&argc, argv);
 	try
 	{
 		tcp::iostream s("localhost", "8972"); //[1] == host, [2] == port
@@ -285,8 +301,8 @@ int main(int argc, char** argv) {
     	cout << GREEN <<"test       - will run the test suite you've created.\n";
     	string st;
     	getline(cin ,st);
-    	//if (st == "test") return RUN_ALL_TESTS();
-		/*else*/ cout << YELLOW << "Starting now!\n";
+    	if (st == "test") return RUN_ALL_TESTS();
+		else cout << YELLOW << "Starting now!\n";
 		int timeset = 20;
 		int x = timeset; //Amount of seconds the players start with
 		const int SIZE = 10;
@@ -309,7 +325,7 @@ int main(int argc, char** argv) {
                 gameboard2 = battleship(1, gameboard2);
 				x = timeset;
                 if (find(gameboard2.begin(), gameboard2.end(), 1) == gameboard2.end()) {
-                cout << CYAN <<"Player 2 has sunk all of player 1's ships! Player 2 WINS!" << endl;
+                cout << CYAN <<"Player 1 has sunk all of player 2's ships! Player 1 WINS!" << endl;
 				break;
 				}
 		}
