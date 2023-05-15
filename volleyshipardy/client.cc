@@ -22,7 +22,7 @@
 #include "/public/colors.h"
 #include <gtest/gtest.h>
 //#include <stdio.h>
-//#include <graphics.h> //graphics.h does not work
+//#include "graphics.h" //graphics.h does not work
 //#include <dos.h> //dos.h does not work
 
 using boost::replace_all;
@@ -143,13 +143,18 @@ vector<int> battleBoard(int SIZE) { //Creates random board (1d vector)
 }
 
 void printBoard(vector<int> gameboard){
-cout << GREEN << " 0 " << " 1 " << " 2 " << " 3 " << " 4 " << " 5 " << " 6 " << " 7 " << " 8 " << " 9 ";
-for(int i = 0; i < gameboard.size(); i++){               // BARE BONES UI CODE, JUST PRINTS A GRID (1/0 == NOTHING, 2 == HIT, -1 == MISS)
-        if (i % int(sqrt(gameboard.size())) == 0) cout << endl;
-        if (gameboard.at(i) == 0 or gameboard.at(i) == 1) cout <<WHITE << "-";
-        else if (gameboard.at(i) == 2) cout << GREEN <<"X";
-        else if (gameboard.at(i) == -1) cout << RED << "O";
-		else if (gameboard.at(i) == 3) cout << YELLOW <<"*";
+	cout << "  ";
+	for(int i = 0; i < 10 ; i++) cout << GREEN << i << " ";
+	for(int i = 0; i < gameboard.size(); i++){// BARE BONES UI CODE, JUST PRINTS A GRID (1/0 == NOTHING, 2 == HIT, -1 == MISS)
+		
+        if (i % int(sqrt(gameboard.size())) == 0){
+			char bob = 65 + (i / 10); 
+			cout << endl << GREEN << bob << " ";
+			}
+        if (gameboard.at(i) == 0 or gameboard.at(i) == 1) cout <<WHITE << "- ";
+        else if (gameboard.at(i) == 2) cout << GREEN <<"X ";
+        else if (gameboard.at(i) == -1) cout << RED << "O ";
+		else if (gameboard.at(i) == 3) cout << YELLOW <<"* ";
         else cout << "Error";
     }
 	cout << endl;
@@ -219,8 +224,8 @@ vector<int> battleship(int player, vector<int> gameboard) {
 }
 
 //printing "Volleyshipardy" does not work
-/*void printVolleyshipardy() {
-    // auto detection
+void printVolleyshipardy() {
+    /*// auto detection
     int gdriver = DETECT,gmode,i;
 
     // initialize graphics mode
@@ -241,7 +246,25 @@ vector<int> battleship(int player, vector<int> gameboard) {
         delay(500);
     }
     delay(2000);
-}*/
+	*/
+	string vol = R"(
+	eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeee(eee(eeeeeeeeeeeeeeeeeeeee)eeeeeeeeeeeeeeeeeeeeeeee(eeeeeeeeeee
+e(eee(eeeeee)\ee)\eee(eee(eeeeeeeee(e/(e(eeeeeeeeeeeee)ee(eeeee)\e)ee(eeeee
+e)\ee)\e(ee((_)((_)e))\ee)\e)ee(eee)\()))\ee`ee)eee(e/(ee)(eee(()/(ee)\e)ee
+((_)((_))\ee_eee_ee/((_)(()/(ee)\e((_)\((_)e/(/(eee)(_))(()\eee((_))(()/(ee
+\e\e/e/((_)|e|e|e|(_))eee)(_))((_)|e|(_)(_)((_)_\e((_)_ee((_)ee_|e|ee)(_))e
+e\eVe//e_e\|e|e|e|/e-_)e|e||e|(_-<|e'e\e|e||e'_e\)/e_`e||e'_|/e_`e|e|e||e|e
+ee\_/e\___/|_|e|_|\___|ee\_,e|/__/|_||_||_||e.__/e\__,_||_|ee\__,_|ee\_,e|e
+eeeeeeeeeeeeeeeeeeeeeeeee|__/eeeeeeeeeeeeee|_|eeeeeeeeeeeeeeeeeeeeeee|__/ee
+	)";
+	for(int x = 0; x < vol.size(); x++) {
+		if (vol.at(x) == 'e') cout << ' ';
+		else if (vol.at(x) == '(' or vol.at(x) == ')') cout << RED << vol.at(x);
+		else if (vol.at(x) == '/' or vol.at(x) == '\\') cout << YELLOW << vol.at(x);
+		else cout << WHITE << vol.at(x);
+}
+}
 
 int main(int argc, char** argv) {
 	//testing::InitGoogleTest(&argc, argv);
@@ -256,11 +279,10 @@ int main(int argc, char** argv) {
 		ifstream myfile("questions.txt");
 		auto rng = default_random_engine {};
 		//string spaces = "                                                                                ";
-		//printVolleyshipardy(); failed
-        cout << YELLOW << "----------Welcome to Volleyshipardy----------\n" << endl;
-        cout << "Please select an option: \n\n";
+		printVolleyshipardy(); //failed
+        cout << CYAN << "\nPlease select an option: \n\n";
     	cout << GREEN << "play       - will start a game of volleyshipardy " << RED << "immediately!\n";
-    	cout << CYAN <<"test       - will run the test suite you've created.\n";
+    	cout << GREEN <<"test       - will run the test suite you've created.\n";
     	string st;
     	getline(cin ,st);
     	//if (st == "test") return RUN_ALL_TESTS();
