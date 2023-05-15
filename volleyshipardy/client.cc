@@ -21,10 +21,15 @@
 #include <chrono>
 #include "/public/colors.h"
 #include <gtest/gtest.h>
+//#include <stdio.h>
+//#include <graphics.h> //graphics.h does not work
+//#include <dos.h> //dos.h does not work
+
 using boost::replace_all;
 using namespace std;
 using boost::asio::ip::tcp;
 using  namespace chrono;
+
 int jeopardy(int player, int &seconds2) {  //Jeopardy function! this performs one wuestion of jeop
  		ifstream myfile("questions.txt");  // open file
 		srand(time(NULL)); //seeding time for rng
@@ -138,6 +143,7 @@ vector<int> battleBoard(int SIZE) { //Creates random board (1d vector)
 }
 
 void printBoard(vector<int> gameboard){
+cout << GREEN << " 0 " << " 1 " << " 2 " << " 3 " << " 4 " << " 5 " << " 6 " << " 7 " << " 8 " << " 9 ";
 for(int i = 0; i < gameboard.size(); i++){               // BARE BONES UI CODE, JUST PRINTS A GRID (1/0 == NOTHING, 2 == HIT, -1 == MISS)
         if (i % int(sqrt(gameboard.size())) == 0) cout << endl;
         if (gameboard.at(i) == 0 or gameboard.at(i) == 1) cout <<WHITE << "-";
@@ -212,6 +218,31 @@ vector<int> battleship(int player, vector<int> gameboard) {
 	return gameboard;		
 }
 
+//printing "Volleyshipardy" does not work
+/*void printVolleyshipardy() {
+    // auto detection
+    int gdriver = DETECT,gmode,i;
+
+    // initialize graphics mode
+    initgraph(&gdriver,&gmode,"C:\\volleyshipardy");
+
+    for (i=3; i<7; i++)
+    {
+        // setcolor of cursor
+        setcolor(i);
+
+        // set text style as
+        // settextstyle(font, orientation, size)
+        settextstyle(i,0,i);
+
+        // print text at coordinate x,y;
+        outtextxy(100,20*i,"Volleyshipardy");
+
+        delay(500);
+    }
+    delay(2000);
+}*/
+
 int main(int argc, char** argv) {
 	//testing::InitGoogleTest(&argc, argv);
 	try
@@ -225,7 +256,9 @@ int main(int argc, char** argv) {
 		ifstream myfile("questions.txt");
 		auto rng = default_random_engine {};
 		//string spaces = "                                                                                ";
-		cout << YELLOW  << "Welcome to Volleyshipardy! Please select an option: \n\n";
+		//printVolleyshipardy(); failed
+        cout << YELLOW << "----------Welcome to Volleyshipardy----------\n" << endl;
+        cout << "Please select an option: \n\n";
     	cout << GREEN << "play       - will start a game of volleyshipardy " << RED << "immediately!\n";
     	cout << CYAN <<"test       - will run the test suite you've created.\n";
     	string st;
